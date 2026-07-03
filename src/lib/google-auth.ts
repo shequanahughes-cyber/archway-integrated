@@ -10,6 +10,15 @@ import type { UserRole } from "@/lib/auth-context";
 
 const googleProvider = new GoogleAuthProvider();
 
+function logAuthAppIdentity(label: string) {
+  console.log(`[google-auth] ${label} - auth.app:`, {
+    appName: auth.app.name,
+    projectId: auth.app.options.projectId,
+    authDomain: auth.app.options.authDomain,
+    apiKey: auth.app.options.apiKey,
+  });
+}
+
 /**
  * Kicks off Google sign-in. Navigates the whole page away to Google's
  * consent screen and back, rather than a popup - popups run into
@@ -17,6 +26,7 @@ const googleProvider = new GoogleAuthProvider();
  * page that a COOP header on our side can't override.
  */
 export async function startGoogleSignIn(): Promise<void> {
+  logAuthAppIdentity("startGoogleSignIn (before redirect)");
   await signInWithRedirect(auth, googleProvider);
 }
 
@@ -60,6 +70,8 @@ let redirectResultPromise: ReturnType<typeof getRedirectResult> | null = null;
  * redirect result (i.e. a normal page load).
  */
 export async function completeGoogleRedirectSignIn(): Promise<UserRole | null> {
+  logAuthAppIdentity("completeGoogleRedirectSignIn (checking redirect result)");
+
   if (!redirectResultPromise) {
     redirectResultPromise = getRedirectResult(auth);
   }

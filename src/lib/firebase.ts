@@ -1,5 +1,11 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
-import { getAuth, type Auth } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  browserPopupRedirectResolver,
+  getAuth,
+  initializeAuth,
+  type Auth,
+} from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -24,8 +30,34 @@ let dbInstance: Firestore | undefined;
 
 if (typeof window !== "undefined") {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  authInstance = getAuth(app);
+
+  // Explicitly pin persistence to browserLocalPersistence (localStorage)
+  // rather than relying on getAuth()'s automatic persistence-hierarchy
+  // fallback, so the signed-in/pending-redirect state is written and read
+  // back the same way on every page load. Must also pass
+  // browserPopupRedirectResolver explicitly - getAuth() includes it by
+  // default, but initializeAuth() does not, and without it
+  // signInWithRedirect/getRedirectResult throw auth/argument-error.
+  // initializeAuth can only be called once per app - if this module
+  // re-evaluates (e.g. Fast Refresh) and auth is already set up, fall
+  // back to getAuth() for the existing instance instead of throwing.
+  try {
+    authInstance = initializeAuth(app, {
+      persistence: [browserLocalPersistence],
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
+  } catch {
+    authInstance = getAuth(app);
+  }
+
   dbInstance = getFirestore(app);
+
+  console.log("[firebase] initialized:", {
+    appName: app.name,
+    projectId: app.options.projectId,
+    authDomain: app.options.authDomain,
+    totalApps: getApps().length,
+  });
 }
 
 export const auth = authInstance as Auth;

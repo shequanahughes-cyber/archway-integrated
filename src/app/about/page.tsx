@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Building2, ShieldCheck, Truck, Users2 } from "lucide-react";
-import LocationCallout from "@/components/LocationCallout";
+import { photos } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "About | Archway Integrated",
@@ -70,18 +71,36 @@ export default function AboutPage() {
               service solutions.
             </p>
           </div>
-          <LocationCallout />
+          <div className="relative aspect-[4/3] overflow-hidden rounded-xl shadow-soft">
+            <Image
+              src={photos.officeTeamDiscussion}
+              alt="Diverse team of colleagues discussing work in an office"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-border bg-primary text-white">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-2xl font-semibold sm:text-3xl">Our Vision</h2>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-white/80">
-            To build a national network of Regional Hubs that strengthen
-            healthcare, workforce, logistics, and public-sector operations
-            across the United States.
-          </p>
+      <section className="relative isolate overflow-hidden border-t border-border">
+        <Image
+          src={photos.warehouseLogisticsTeam}
+          alt="Logistics team walking through a warehouse"
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-[#16324F]/40" />
+        <div className="relative mx-auto max-w-6xl px-6 py-20 sm:py-28">
+          <div className="max-w-md rounded-xl bg-primary p-8 text-white shadow-soft-lg sm:p-10">
+            <h2 className="text-2xl font-semibold sm:text-3xl">Our Vision</h2>
+            <p className="mt-5 text-lg leading-8 text-white/80">
+              To build a national network of Regional Hubs that strengthen
+              healthcare, workforce, logistics, and public-sector operations
+              across the United States.
+            </p>
+          </div>
         </div>
       </section>
 

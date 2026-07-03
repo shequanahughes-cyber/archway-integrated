@@ -1,21 +1,32 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { serviceCategories } from "@/lib/services";
+import { photos } from "@/lib/images";
 import LocationCallout from "@/components/LocationCallout";
 
 export default function Home() {
   return (
     <>
-      <section className="border-b border-border bg-muted">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center">
+      <section className="relative isolate overflow-hidden">
+        <Image
+          src={photos.officeTeamMeeting}
+          alt="Diverse team of professionals collaborating in a modern office"
+          fill
+          preload
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-[#16324F]/80" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 text-center sm:py-32">
           <p className="text-sm font-semibold uppercase tracking-widest text-accent">
             One Partner. Multiple Solutions. Regional Impact.
           </p>
-          <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-primary sm:text-5xl">
+          <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Integrated compliance, health, and logistics support for the
             organizations that keep your region running.
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/70">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/80">
             Archway Integrated brings identity verification, occupational
             health, medical logistics, workforce, and transportation services
             together under a single regional partner, so your teams spend
@@ -25,7 +36,7 @@ export default function Home() {
           <div className="mt-10 flex justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-white transition-colors hover:bg-primary-dark"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-semibold text-primary transition-colors hover:bg-white/90"
             >
               Partner With Us
               <ArrowRight className="h-4 w-4" />

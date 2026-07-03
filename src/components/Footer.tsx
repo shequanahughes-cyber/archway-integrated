@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { serviceCategories } from "@/lib/services";
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-primary-dark text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-3">
         <div>
           <p className="text-lg font-semibold">Archway Integrated</p>
           <p className="mt-3 text-sm leading-6 text-white/70">
@@ -14,7 +13,7 @@ export default function Footer() {
 
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-white/50">
-            Company
+            Quick Links
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
             <li>
@@ -42,26 +41,10 @@ export default function Footer() {
 
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-white/50">
-            Services
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-white/70">
-            {serviceCategories.map((category) => (
-              <li key={category.slug}>
-                <Link href={`/services#${category.slug}`} className="hover:text-white">
-                  {category.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-white/50">
             Contact
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
             <li>Downtown St. Louis Regional Hub</li>
-            <li className="text-white/40">Address — TBD</li>
             <li className="text-white/40">Phone — TBD</li>
             <li className="text-white/40">Email — TBD</li>
           </ul>

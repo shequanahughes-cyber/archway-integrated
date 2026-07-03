@@ -1,12 +1,9 @@
-import { useId } from "react";
 import type { SVGProps } from "react";
 
 export default function ArchLogo({
   className = "h-7 w-[26px] overflow-visible",
   ...props
 }: SVGProps<SVGSVGElement>) {
-  const filterId = useId();
-
   return (
     <svg
       viewBox="0 0 30 32"
@@ -16,24 +13,9 @@ export default function ArchLogo({
       className={className}
       {...props}
     >
-      <defs>
-        <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow
-            dx="0"
-            dy="1.5"
-            stdDeviation="1"
-            floodColor="#000000"
-            floodOpacity="0.25"
-          />
-        </filter>
-      </defs>
       <path
-        d="M5 29V14A10 7 0 0 1 25 14V29"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        filter={`url(#${filterId})`}
+        fill="currentColor"
+        d="M3 31 L3 15 A12 11 0 0 1 27 15 L27 31 L21 31 L21 16 A6 6 0 0 0 9 16 L9 31 Z"
       />
     </svg>
   );

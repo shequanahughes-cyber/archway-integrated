@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Self-registration always creates a "client" role document for
+      // the signed-in user. Staff accounts are created manually
+      // (e.g. via the Firebase Console or Admin SDK), which bypasses
+      // these rules.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.role == "client";
+
+      // Users can update their own profile but cannot change their
+      // own role (prevents client -> staff self-escalation).
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role;
+
+      allow delete: if false;
+    }
+  }
+}

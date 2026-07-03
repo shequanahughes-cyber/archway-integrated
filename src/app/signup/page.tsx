@@ -1,26 +1,27 @@
 import type { Metadata } from "next";
-import LoginForm from "@/components/LoginForm";
+import SignupForm from "@/components/SignupForm";
 
 export const metadata: Metadata = {
-  title: "Login | Archway Integrated",
-  description: "Client and staff portal access for Archway Integrated.",
+  title: "Sign Up | Archway Integrated",
+  description: "Create a client account with Archway Integrated's Regional Hub.",
 };
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <section className="mx-auto max-w-xl px-6 py-20">
       <p className="text-sm font-semibold uppercase tracking-widest text-accent">
         Client & Staff Portal
       </p>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
-        Welcome back.
+        Create your account.
       </h1>
       <p className="mt-4 text-base leading-7 text-foreground/70">
-        Log in to access your dashboard.
+        Sign up to manage your services and requests with your Archway
+        Integrated Regional Hub team.
       </p>
 
       <div className="mt-8">
-        <LoginForm />
+        <SignupForm />
       </div>
     </section>
   );

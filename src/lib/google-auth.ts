@@ -1,4 +1,9 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  getRedirectResult,
+  signInWithRedirect,
+  type User,
+} from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { UserRole } from "@/lib/auth-context";
@@ -6,15 +11,23 @@ import type { UserRole } from "@/lib/auth-context";
 const googleProvider = new GoogleAuthProvider();
 
 /**
- * Signs the user in with a Google popup. If this is their first time
- * signing in, creates a matching `users/{uid}` doc with role "client"
- * (Google sign-in is only offered on the client/staff-shared login and
- * signup pages, and self-service accounts always default to "client").
- * Returns the user's role so the caller can redirect appropriately.
+ * Kicks off Google sign-in. Navigates the whole page away to Google's
+ * consent screen and back, rather than a popup - popups run into
+ * Cross-Origin-Opener-Policy restrictions on Google's own auth handler
+ * page that a COOP header on our side can't override.
  */
-export async function signInWithGoogle(): Promise<UserRole> {
-  const credential = await signInWithPopup(auth, googleProvider);
-  const userRef = doc(db, "users", credential.user.uid);
+export async function startGoogleSignIn(): Promise<void> {
+  await signInWithRedirect(auth, googleProvider);
+}
+
+/**
+ * If this is the user's first time signing in, creates a matching
+ * `users/{uid}` doc with role "client" (self-service accounts always
+ * default to "client"; staff accounts are created manually). Returns
+ * the user's role either way.
+ */
+async function ensureUserDoc(user: User): Promise<UserRole> {
+  const userRef = doc(db, "users", user.uid);
   const snapshot = await getDoc(userRef);
 
   if (snapshot.exists()) {
@@ -22,12 +35,25 @@ export async function signInWithGoogle(): Promise<UserRole> {
   }
 
   await setDoc(userRef, {
-    uid: credential.user.uid,
-    name: credential.user.displayName ?? "",
-    email: credential.user.email ?? "",
+    uid: user.uid,
+    name: user.displayName ?? "",
+    email: user.email ?? "",
     role: "client",
     createdAt: serverTimestamp(),
   });
 
   return "client";
+}
+
+/**
+ * Call on mount from any page that renders the Google sign-in button.
+ * Checks whether the page just loaded after returning from Google's
+ * redirect flow; if so, ensures a Firestore profile exists and returns
+ * the role to redirect to. Returns null when there's no pending
+ * redirect result (i.e. a normal page load).
+ */
+export async function completeGoogleRedirectSignIn(): Promise<UserRole | null> {
+  const result = await getRedirectResult(auth);
+  if (!result) return null;
+  return ensureUserDoc(result.user);
 }

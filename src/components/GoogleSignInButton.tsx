@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithGoogle } from "@/lib/google-auth";
+import { completeGoogleRedirectSignIn, startGoogleSignIn } from "@/lib/google-auth";
 import GoogleLogo from "@/components/GoogleLogo";
 
 function mapGoogleError(error: unknown): string | null {
   const code = (error as { code?: string } | null)?.code;
   switch (code) {
-    // The user closed the popup or opened a second one; not an error worth surfacing.
-    case "auth/popup-closed-by-user":
+    // The user backed out of the Google consent screen; not worth surfacing.
+    case "auth/redirect-cancelled-by-user":
     case "auth/cancelled-popup-request":
       return null;
-    case "auth/popup-blocked":
-      return "Your browser blocked the sign-in popup. Please allow popups and try again.";
+    case "auth/account-exists-with-different-credential":
+      return "An account already exists with this email using a different sign-in method.";
     default:
       return "Something went wrong signing in with Google. Please try again.";
   }
@@ -27,13 +27,37 @@ export default function GoogleSignInButton({
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
+  // Runs after the browser comes back from Google's redirect flow.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const role = await completeGoogleRedirectSignIn();
+        if (role && !cancelled) {
+          setSubmitting(true);
+          router.push(role === "staff" ? "/staff/dashboard" : "/client/dashboard");
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message = mapGoogleError(err);
+          if (message) onError(message);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleClick() {
     onError(null);
     setSubmitting(true);
 
     try {
-      const role = await signInWithGoogle();
-      router.push(role === "staff" ? "/staff/dashboard" : "/client/dashboard");
+      await startGoogleSignIn(); // navigates away; nothing after this runs
     } catch (err) {
       const message = mapGoogleError(err);
       if (message) onError(message);

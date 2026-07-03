@@ -45,6 +45,13 @@ async function ensureUserDoc(user: User): Promise<UserRole> {
   return "client";
 }
 
+// getRedirectResult() is one-time-consumable: once it returns the pending
+// result, calling it again returns null even on the very next call. Cache
+// the in-flight/resolved promise at module scope so every caller on this
+// page load (e.g. React Strict Mode's double-invoked effects in dev) sees
+// the same outcome instead of racing to consume it.
+let redirectResultPromise: ReturnType<typeof getRedirectResult> | null = null;
+
 /**
  * Call on mount from any page that renders the Google sign-in button.
  * Checks whether the page just loaded after returning from Google's
@@ -53,7 +60,18 @@ async function ensureUserDoc(user: User): Promise<UserRole> {
  * redirect result (i.e. a normal page load).
  */
 export async function completeGoogleRedirectSignIn(): Promise<UserRole | null> {
-  const result = await getRedirectResult(auth);
+  if (!redirectResultPromise) {
+    redirectResultPromise = getRedirectResult(auth);
+  }
+
+  const result = await redirectResultPromise;
+  console.log(
+    "[google-auth] getRedirectResult():",
+    result
+      ? { uid: result.user.uid, email: result.user.email, displayName: result.user.displayName }
+      : null
+  );
+
   if (!result) return null;
   return ensureUserDoc(result.user);
 }

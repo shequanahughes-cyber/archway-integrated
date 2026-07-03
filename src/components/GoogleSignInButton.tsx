@@ -5,15 +5,17 @@ import { useRouter } from "next/navigation";
 import { completeGoogleRedirectSignIn, startGoogleSignIn } from "@/lib/google-auth";
 import GoogleLogo from "@/components/GoogleLogo";
 
-function mapGoogleError(error: unknown): string | null {
+function mapGoogleError(error: unknown): string {
+  console.error("[google-auth] error:", error);
   const code = (error as { code?: string } | null)?.code;
   switch (code) {
-    // The user backed out of the Google consent screen; not worth surfacing.
-    case "auth/redirect-cancelled-by-user":
-    case "auth/cancelled-popup-request":
-      return null;
     case "auth/account-exists-with-different-credential":
       return "An account already exists with this email using a different sign-in method.";
+    case "auth/web-storage-unsupported":
+    case "auth/operation-not-supported-in-this-environment":
+      return "This browser doesn't support Google sign-in here (try disabling private/incognito mode or a browser extension blocking storage).";
+    case "auth/unauthorized-domain":
+      return "This domain isn't authorized for Google sign-in yet. Please contact support.";
     default:
       return "Something went wrong signing in with Google. Please try again.";
   }
@@ -34,14 +36,14 @@ export default function GoogleSignInButton({
     (async () => {
       try {
         const role = await completeGoogleRedirectSignIn();
+        console.log("[GoogleSignInButton] resolved role after redirect check:", role);
         if (role && !cancelled) {
           setSubmitting(true);
           router.push(role === "staff" ? "/staff/dashboard" : "/client/dashboard");
         }
       } catch (err) {
         if (!cancelled) {
-          const message = mapGoogleError(err);
-          if (message) onError(message);
+          onError(mapGoogleError(err));
         }
       }
     })();
@@ -59,8 +61,7 @@ export default function GoogleSignInButton({
     try {
       await startGoogleSignIn(); // navigates away; nothing after this runs
     } catch (err) {
-      const message = mapGoogleError(err);
-      if (message) onError(message);
+      onError(mapGoogleError(err));
       setSubmitting(false);
     }
   }

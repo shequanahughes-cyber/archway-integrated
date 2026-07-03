@@ -37,9 +37,16 @@ service cloud.firestore {
         && request.resource.data.clientId == request.auth.uid
         && request.resource.data.status == "submitted";
 
-      // No client-side status updates yet - that lands with the staff
-      // dashboard.
-      allow update, delete: if false;
+      // Only staff can update a request, and only its status field -
+      // the staff dashboard's status control is the only writer here.
+      // Clients cannot update their own requests at all (e.g. can't
+      // mark their own request "completed").
+      allow update: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "staff"
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"])
+        && request.resource.data.status in ["submitted", "in_progress", "completed"];
+
+      allow delete: if false;
     }
   }
 }

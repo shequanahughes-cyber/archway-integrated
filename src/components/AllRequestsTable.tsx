@@ -3,38 +3,35 @@
 import { useEffect, useState } from "react";
 import {
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   Timestamp,
-  where,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAuth } from "@/lib/auth-context";
-import { formatStatus, statusStyles } from "@/lib/requests";
+import { formatStatus, REQUEST_STATUSES, type RequestStatus } from "@/lib/requests";
 
-interface ServiceRequest {
+interface StaffServiceRequest {
   id: string;
+  clientName: string;
+  company: string;
   category: string;
   description: string;
   status: string;
   createdAt: Timestamp | null;
 }
 
-export default function ClientRequestsList() {
-  const { user } = useAuth();
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+export default function AllRequestsTable() {
+  const [requests, setRequests] = useState<StaffServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-
-    const requestsQuery = query(
-      collection(db, "requests"),
-      where("clientId", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+    const requestsQuery = query(collection(db, "requests"), orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(
       requestsQuery,
@@ -42,25 +39,39 @@ export default function ClientRequestsList() {
         setRequests(
           snapshot.docs.map((docSnapshot) => ({
             id: docSnapshot.id,
-            ...(docSnapshot.data() as Omit<ServiceRequest, "id">),
+            ...(docSnapshot.data() as Omit<StaffServiceRequest, "id">),
           }))
         );
         setLoading(false);
       },
       (err) => {
-        console.error("[requests] error loading requests:", err);
-        setError("Couldn't load your requests. Please refresh the page.");
+        console.error("[requests] error loading all requests:", err);
+        setError("Couldn't load requests. Please refresh the page.");
         setLoading(false);
       }
     );
 
     return unsubscribe;
-  }, [user]);
+  }, []);
+
+  async function handleStatusChange(requestId: string, status: RequestStatus) {
+    setUpdatingId(requestId);
+    setRowError(null);
+
+    try {
+      await updateDoc(doc(db, "requests", requestId), { status });
+    } catch (err) {
+      console.error("[requests] error updating status:", err);
+      setRowError({ id: requestId, message: "Couldn't update status. Please try again." });
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   if (loading) {
     return (
       <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-foreground/60 sm:p-10">
-        Loading your requests...
+        Loading requests...
       </div>
     );
   }
@@ -68,9 +79,7 @@ export default function ClientRequestsList() {
   if (error) {
     return (
       <div className="rounded-2xl border border-border bg-white p-8 sm:p-10">
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </p>
+        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       </div>
     );
   }
@@ -78,7 +87,7 @@ export default function ClientRequestsList() {
   if (requests.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-muted p-8 text-center text-sm text-foreground/60 sm:p-10">
-        You haven&apos;t submitted any requests yet.
+        No client requests yet.
       </div>
     );
   }
@@ -89,6 +98,8 @@ export default function ClientRequestsList() {
         <table className="w-full text-left text-sm">
           <thead className="border-b border-border bg-muted/50 text-xs font-semibold uppercase tracking-wide text-foreground/50">
             <tr>
+              <th className="px-6 py-4">Client</th>
+              <th className="px-6 py-4">Company</th>
               <th className="px-6 py-4">Category</th>
               <th className="px-6 py-4">Description</th>
               <th className="px-6 py-4">Status</th>
@@ -98,20 +109,36 @@ export default function ClientRequestsList() {
           <tbody className="divide-y divide-border">
             {requests.map((request) => (
               <tr key={request.id}>
-                <td className="px-6 py-4 font-medium text-primary">
+                <td className="whitespace-nowrap px-6 py-4 font-medium text-primary">
+                  {request.clientName}
+                </td>
+                <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
+                  {request.company || "—"}
+                </td>
+                <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
                   {request.category}
                 </td>
                 <td className="max-w-xs px-6 py-4 text-foreground/70">
                   {request.description}
                 </td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                      statusStyles[request.status] ?? "bg-muted text-foreground/60"
-                    }`}
+                  <select
+                    value={request.status}
+                    onChange={(event) =>
+                      handleStatusChange(request.id, event.target.value as RequestStatus)
+                    }
+                    disabled={updatingId === request.id}
+                    className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground/80 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {formatStatus(request.status)}
-                  </span>
+                    {REQUEST_STATUSES.map((status) => (
+                      <option key={status} value={status}>
+                        {formatStatus(status)}
+                      </option>
+                    ))}
+                  </select>
+                  {rowError && rowError.id === request.id && (
+                    <p className="mt-1.5 text-xs text-red-700">{rowError.message}</p>
+                  )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-foreground/60">
                   {request.createdAt

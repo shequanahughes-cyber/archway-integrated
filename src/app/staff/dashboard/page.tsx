@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import AllRequestsTable from "@/components/AllRequestsTable";
 
 export default function StaffDashboardPage() {
   const { profile, logout } = useAuth();
@@ -13,23 +14,33 @@ export default function StaffDashboardPage() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-20">
-      <p className="text-sm font-semibold uppercase tracking-widest text-accent">
-        Staff Portal
-      </p>
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
-        Welcome, {profile?.name}
-      </h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-foreground/70">
-        Your dashboard is coming soon. This is where you&apos;ll manage
-        client accounts, requests, and Regional Hub operations.
-      </p>
-      <button
-        onClick={handleLogout}
-        className="mt-8 rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary/5"
-      >
-        Log out
-      </button>
+    <section className="mx-auto max-w-6xl px-6 py-20">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+            Staff Portal
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
+            Welcome, {profile?.name}
+          </h1>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="inline-flex shrink-0 items-center justify-center rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary/5"
+        >
+          Log out
+        </button>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-xl font-semibold text-primary">All Requests</h2>
+        <p className="mt-1 text-sm text-foreground/70">
+          Every client service request, most recent first.
+        </p>
+        <div className="mt-4">
+          <AllRequestsTable />
+        </div>
+      </div>
     </section>
   );
 }

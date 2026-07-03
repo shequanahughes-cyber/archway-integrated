@@ -1,34 +1,9 @@
-import {
-  GoogleAuthProvider,
-  getRedirectResult,
-  signInWithRedirect,
-  type User,
-} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, type User } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { UserRole } from "@/lib/auth-context";
 
 const googleProvider = new GoogleAuthProvider();
-
-function logAuthAppIdentity(label: string) {
-  console.log(`[google-auth] ${label} - auth.app:`, {
-    appName: auth.app.name,
-    projectId: auth.app.options.projectId,
-    authDomain: auth.app.options.authDomain,
-    apiKey: auth.app.options.apiKey,
-  });
-}
-
-/**
- * Kicks off Google sign-in. Navigates the whole page away to Google's
- * consent screen and back, rather than a popup - popups run into
- * Cross-Origin-Opener-Policy restrictions on Google's own auth handler
- * page that a COOP header on our side can't override.
- */
-export async function startGoogleSignIn(): Promise<void> {
-  logAuthAppIdentity("startGoogleSignIn (before redirect)");
-  await signInWithRedirect(auth, googleProvider);
-}
 
 /**
  * If this is the user's first time signing in, creates a matching
@@ -55,35 +30,19 @@ async function ensureUserDoc(user: User): Promise<UserRole> {
   return "client";
 }
 
-// getRedirectResult() is one-time-consumable: once it returns the pending
-// result, calling it again returns null even on the very next call. Cache
-// the in-flight/resolved promise at module scope so every caller on this
-// page load (e.g. React Strict Mode's double-invoked effects in dev) sees
-// the same outcome instead of racing to consume it.
-let redirectResultPromise: ReturnType<typeof getRedirectResult> | null = null;
-
 /**
- * Call on mount from any page that renders the Google sign-in button.
- * Checks whether the page just loaded after returning from Google's
- * redirect flow; if so, ensures a Firestore profile exists and returns
- * the role to redirect to. Returns null when there's no pending
- * redirect result (i.e. a normal page load).
+ * Signs the user in with a Google popup and resolves with their role.
+ * signInWithRedirect was tried instead of this (to dodge a
+ * Cross-Origin-Opener-Policy console warning on the popup path), but it
+ * ran into a worse problem: Chrome's Bounce Tracking Mitigation purges
+ * storage for archway-integrated.firebaseapp.com since it's only ever
+ * used as a pass-through hop in the redirect chain, which broke
+ * getRedirectResult() outright. The COOP warning here only blocks the
+ * SDK's popup.closed polling (used to detect a manually-closed popup);
+ * the actual result handoff goes over postMessage, which COOP doesn't
+ * touch, so sign-in itself isn't affected by it.
  */
-export async function completeGoogleRedirectSignIn(): Promise<UserRole | null> {
-  logAuthAppIdentity("completeGoogleRedirectSignIn (checking redirect result)");
-
-  if (!redirectResultPromise) {
-    redirectResultPromise = getRedirectResult(auth);
-  }
-
-  const result = await redirectResultPromise;
-  console.log(
-    "[google-auth] getRedirectResult():",
-    result
-      ? { uid: result.user.uid, email: result.user.email, displayName: result.user.displayName }
-      : null
-  );
-
-  if (!result) return null;
-  return ensureUserDoc(result.user);
+export async function signInWithGoogle(): Promise<UserRole> {
+  const credential = await signInWithPopup(auth, googleProvider);
+  return ensureUserDoc(credential.user);
 }

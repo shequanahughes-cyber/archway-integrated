@@ -26,6 +26,7 @@ export default function ServiceRequestForm() {
       await addDoc(collection(db, "requests"), {
         clientId: user.uid,
         clientName: profile.name,
+        clientEmail: profile.email,
         company: profile.company ?? "",
         category,
         description,

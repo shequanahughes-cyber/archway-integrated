@@ -16,6 +16,7 @@ import { formatStatus, REQUEST_STATUSES, type RequestStatus } from "@/lib/reques
 interface StaffServiceRequest {
   id: string;
   clientName: string;
+  clientEmail?: string;
   company: string;
   category: string;
   description: string;
@@ -109,8 +110,13 @@ export default function AllRequestsTable() {
           <tbody className="divide-y divide-border">
             {requests.map((request) => (
               <tr key={request.id}>
-                <td className="whitespace-nowrap px-6 py-4 font-medium text-primary">
-                  {request.clientName}
+                <td className="whitespace-nowrap px-6 py-4">
+                  <span className="font-medium text-primary">{request.clientName}</span>
+                  {request.clientEmail && (
+                    <span className="block text-xs text-foreground/50">
+                      {request.clientEmail}
+                    </span>
+                  )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
                   {request.company || "—"}

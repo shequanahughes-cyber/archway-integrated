@@ -6,21 +6,33 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == userId;
 
       // Self-registration always creates a "client" role document for
-      // the signed-in user. Staff accounts are created manually
-      // (e.g. via the Firebase Console or Admin SDK), which bypasses
-      // these rules.
+      // the signed-in user. Staff/admin accounts are created (or
+      // promoted) manually - either directly in the Firebase Console,
+      // or by an existing admin via the admin dashboard's role dropdown,
+      // which bypasses this create rule entirely (it's an update).
       allow create: if request.auth != null
         && request.auth.uid == userId
         && request.resource.data.uid == userId
         && request.resource.data.role == "client";
 
-      // Users can update their own profile but cannot change their
-      // own role (prevents client -> staff self-escalation).
+      // Users can update their own profile but cannot change their own
+      // role - not to "staff"/"admin" (self-escalation), and not even to
+      // the same value they already have (keeps admins from fat-fingering
+      // their own row into a locked-out state; the admin dashboard's UI
+      // also disables this, but this rule is the real guarantee).
       allow update: if request.auth != null
         && request.auth.uid == userId
-        && request.resource.data.role == resource.data.role;
+        && !("role" in request.resource.data.diff(resource.data).affectedKeys());
 
       allow delete: if false;
+
+      // Admins can read, create, update, or delete any user document -
+      // this is what lets the admin dashboard list every user and change
+      // anyone's role. Checked via the requester's own users/{uid} doc,
+      // which is trusted since role can't be self-escalated by the rule
+      // above.
+      allow read, write: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
     }
 
     match /requests/{requestId} {

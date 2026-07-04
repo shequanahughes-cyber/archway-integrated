@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { dashboardPathForRole } from "@/lib/auth-context";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 function mapFirebaseError(error: unknown): string {
@@ -49,7 +50,7 @@ export default function LoginForm() {
       }
 
       const role = snapshot.data().role;
-      router.push(role === "staff" ? "/staff/dashboard" : "/client/dashboard");
+      router.push(dashboardPathForRole(role));
     } catch (err) {
       setError(mapFirebaseError(err));
       setSubmitting(false);

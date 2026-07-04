@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithGoogle } from "@/lib/google-auth";
+import { dashboardPathForRole } from "@/lib/auth-context";
 import GoogleLogo from "@/components/GoogleLogo";
 
 function mapGoogleError(error: unknown): string | null {
@@ -59,7 +60,7 @@ export default function GoogleSignInButton({
 
     try {
       const role = await withTimeout(signInWithGoogle(), SIGN_IN_TIMEOUT_MS);
-      router.push(role === "staff" ? "/staff/dashboard" : "/client/dashboard");
+      router.push(dashboardPathForRole(role));
     } catch (err) {
       if (err instanceof Error && err.message === "GOOGLE_SIGN_IN_TIMEOUT") {
         onError(

@@ -11,7 +11,7 @@ import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
-export type UserRole = "client" | "staff";
+export type UserRole = "client" | "staff" | "admin";
 
 export interface UserProfile {
   uid: string;
@@ -19,6 +19,17 @@ export interface UserProfile {
   email: string;
   company?: string;
   role: UserRole;
+}
+
+export function dashboardPathForRole(role: UserRole): string {
+  switch (role) {
+    case "admin":
+      return "/admin/dashboard";
+    case "staff":
+      return "/staff/dashboard";
+    default:
+      return "/client/dashboard";
+  }
 }
 
 interface AuthContextValue {

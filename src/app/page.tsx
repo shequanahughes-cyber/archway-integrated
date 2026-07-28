@@ -19,7 +19,7 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-[#16324F]/80" />
         <div className="relative mx-auto max-w-6xl px-6 py-24 text-center sm:py-32">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent-light">
             One Partner. Multiple Solutions. Regional Impact.
           </p>
           <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">

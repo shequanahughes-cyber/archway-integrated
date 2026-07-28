@@ -5,7 +5,9 @@
   --foreground: #10202f;
   --primary: #0b3554;
   --primary-dark: #082742;
-  --accent: #c99b4e;
+  --accent: #00798e;
+  /* accent is too dark for text on navy backgrounds; use this instead there. */
+  --accent-light: #5fc8d6;
   --muted: #f4f6f8;
   --border: #e2e8f0;
 }
@@ -16,6 +18,7 @@
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);

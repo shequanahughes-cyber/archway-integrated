@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -5,7 +6,13 @@ export default function Footer() {
     <footer className="border-t border-border bg-primary-dark text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-3">
         <div>
-          <p className="text-lg font-semibold">Archway Integrated</p>
+          <Image
+            src="/logo-white.png"
+            alt="Archway Medical & Integrated Services"
+            width={1080}
+            height={855}
+            className="h-14 w-auto"
+          />
           <p className="mt-3 text-sm leading-6 text-white/70">
             One Partner. Multiple Solutions. Regional Impact.
           </p>

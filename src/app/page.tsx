@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { serviceCategories } from "@/lib/services";
+import { divisionStatus, divisions } from "@/lib/services";
 import { photos } from "@/lib/images";
 import LocationCallout from "@/components/LocationCallout";
+import StatusBadge from "@/components/StatusBadge";
+import ActionCards from "@/components/ActionCards";
 
 export default function Home() {
   return (
@@ -23,23 +25,28 @@ export default function Home() {
             One Partner. Multiple Solutions. Regional Impact.
           </p>
           <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            Integrated compliance, health, and logistics support for the
+            Medical, testing, workforce, and logistics services for the
             organizations that keep your region running.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/80">
-            Archway Integrated brings identity verification, occupational
-            health, medical logistics, workforce, and transportation services
-            together under a single regional partner, so your teams spend
-            less time managing vendors and more time doing the work that
-            matters.
+            Archway Integrated brings {divisions.length} service divisions
+            together under a single regional partner, from medical testing
+            and professional testing to medical distribution, workforce
+            services, and logistics.
           </p>
-          <div className="mt-10 flex justify-center">
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
-              href="/contact"
+              href="/appointments"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-semibold text-primary transition-colors hover:bg-white/90"
             >
-              Partner With Us
+              Request an Appointment
               <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/partners"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/70 px-7 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Partner With Us
             </Link>
           </div>
         </div>
@@ -72,7 +79,7 @@ export default function Home() {
                 What we do
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/70">
-                Five integrated service categories, one regional partner.
+                {divisions.length} service divisions, one regional partner.
               </p>
             </div>
             <Link
@@ -85,22 +92,25 @@ export default function Home() {
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {serviceCategories.map((category) => {
-              const Icon = category.icon;
+            {divisions.map((division) => {
+              const Icon = division.icon;
               return (
                 <Link
-                  key={category.slug}
-                  href={`/services#${category.slug}`}
+                  key={division.slug}
+                  href={`/services/${division.slug}`}
                   className="group flex flex-col rounded-xl bg-white p-8 shadow-soft transition-shadow hover:shadow-soft-lg sm:p-10"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <StatusBadge status={divisionStatus(division)} />
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-primary">
-                    {category.title}
+                    {division.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-foreground/70">
-                    {category.summary}
+                  <p className="mt-2 flex-1 text-sm leading-6 text-foreground/70">
+                    {division.summary}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent">
                     Learn more
@@ -110,6 +120,15 @@ export default function Home() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="text-2xl font-semibold text-primary sm:text-3xl">
+          How can we help?
+        </h2>
+        <div className="mt-10">
+          <ActionCards />
         </div>
       </section>
     </>

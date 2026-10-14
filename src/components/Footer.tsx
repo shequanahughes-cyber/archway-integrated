@@ -1,10 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
+import { divisions } from "@/lib/services";
+import { contactInfo } from "@/lib/site";
+
+const quickLinks = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Services" },
+  { href: "/appointments", label: "Request an Appointment" },
+  { href: "/business-accounts", label: "Business Accounts" },
+  { href: "/partners", label: "Become a Partner" },
+  { href: "/contact", label: "Contact Us" },
+];
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-primary-dark text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Image
             src="/logo-white.png"
@@ -20,29 +32,34 @@ export default function Footer() {
 
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-white/50">
+            Services
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-white/70">
+            {divisions.map((division) => (
+              <li key={division.slug}>
+                <Link
+                  href={`/services/${division.slug}`}
+                  className="hover:text-white"
+                >
+                  {division.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wide text-white/50">
             Quick Links
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
-            <li>
-              <Link href="/" className="hover:text-white">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="hover:text-white">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/services" className="hover:text-white">
-                Services
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-white">
-                Contact
-              </Link>
-            </li>
+            {quickLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-white">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -51,9 +68,14 @@ export default function Footer() {
             Contact
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
-            <li>Downtown St. Louis Regional Hub</li>
-            <li className="text-white/40">Phone — TBD</li>
-            <li className="text-white/40">Email — TBD</li>
+            <li>{contactInfo.location}</li>
+            {contactInfo.address && <li>{contactInfo.address}</li>}
+            <li className={contactInfo.phone ? undefined : "text-white/40"}>
+              {contactInfo.phone ?? "Phone - TBD"}
+            </li>
+            <li className={contactInfo.email ? undefined : "text-white/40"}>
+              {contactInfo.email ?? "Email - TBD"}
+            </li>
           </ul>
         </div>
       </div>

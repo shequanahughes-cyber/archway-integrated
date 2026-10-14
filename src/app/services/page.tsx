@@ -1,86 +1,96 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, ArrowRight } from "lucide-react";
-import { serviceCategories } from "@/lib/services";
+import { ArrowRight } from "lucide-react";
+import { countByStatus, divisions, serviceStatuses } from "@/lib/services";
+import PageHeader from "@/components/PageHeader";
+import StatusBadge from "@/components/StatusBadge";
+import ActionCards from "@/components/ActionCards";
 
 export const metadata: Metadata = {
   title: "Services | Archway Integrated",
   description:
-    "Identity & Compliance, Occupational Health, Medical Logistics, Workforce Solutions, and Transportation & Logistics — five integrated service categories from one regional partner.",
+    "Medical Testing & Screening, Professional Testing Center, Bioscience & Laboratory, Medical Distribution, Workforce Services, Logistics & Drop-Off Hub, and Archway Global.",
 };
 
 export default function ServicesPage() {
   return (
     <>
-      <section className="border-b border-border bg-muted">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent">
-            Services
-          </p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-primary sm:text-5xl">
-            Five integrated service categories, one regional partner.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-foreground/70">
-            Every service below is coordinated by the same Archway Integrated
-            team, so nothing falls through the cracks between vendors.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Services"
+        title={`${divisions.length} service divisions, one regional partner.`}
+      >
+        Every division below is coordinated by the same Archway team. See
+        what&apos;s available today, what&apos;s coming soon, and where
+        we&apos;re headed next.
+      </PageHeader>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-16">
-          {serviceCategories.map((category) => {
-            const Icon = category.icon;
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {divisions.map((division) => {
+            const Icon = division.icon;
             return (
-              <div
-                key={category.slug}
-                id={category.slug}
-                className="scroll-mt-24 grid gap-8 rounded-xl bg-white p-8 shadow-soft sm:p-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+              <Link
+                key={division.slug}
+                href={`/services/${division.slug}`}
+                className="group flex flex-col rounded-xl bg-white p-8 shadow-soft transition-shadow hover:shadow-soft-lg"
               >
-                <div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h2 className="mt-5 text-2xl font-semibold text-primary">
-                    {category.title}
-                  </h2>
-                  <p className="mt-3 text-base leading-7 text-foreground/70">
-                    {category.summary}
-                  </p>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Icon className="h-6 w-6" />
                 </div>
-                <ul className="grid content-start gap-3 sm:grid-cols-2">
-                  {category.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2.5 rounded-xl bg-muted px-4 py-3 text-sm font-medium text-foreground/80"
-                    >
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <h2 className="mt-5 text-xl font-semibold text-primary">
+                  {division.title}
+                </h2>
+                <p className="mt-2 flex-1 text-sm leading-6 text-foreground/70">
+                  {division.summary}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {serviceStatuses.map(({ key }) => {
+                    const count = countByStatus(division, key);
+                    if (count === 0) return null;
+                    return <StatusBadge key={key} status={key} count={count} />;
+                  })}
+                </div>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-accent">
+                  Explore division
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
             );
           })}
         </div>
       </section>
 
-      <section className="border-t border-border bg-primary">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-16 text-center text-white">
-          <h2 className="text-2xl font-semibold sm:text-3xl">
-            Not sure which service fits your organization?
+      <section className="border-t border-border bg-muted">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-2xl font-semibold text-primary sm:text-3xl">
+            How we show our services
           </h2>
-          <p className="max-w-xl text-base leading-7 text-white/80">
-            Tell us what you&apos;re working on and we&apos;ll match you with
-            the right service — or combination of services.
+          <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/70">
+            Archway is growing. Every service is labeled so you know exactly
+            what we can do for you today.
           </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-semibold text-primary transition-colors hover:bg-white/90"
-          >
-            Partner With Us
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {serviceStatuses.map((status) => (
+              <div
+                key={status.key}
+                className="rounded-xl bg-white p-8 shadow-soft"
+              >
+                <StatusBadge status={status.key} />
+                <p className="mt-4 text-sm leading-6 text-foreground/70">
+                  {status.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="text-2xl font-semibold text-primary sm:text-3xl">
+          Ready to get started?
+        </h2>
+        <div className="mt-10">
+          <ActionCards />
         </div>
       </section>
     </>

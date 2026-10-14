@@ -4,11 +4,11 @@ import { useState, type FormEvent } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { serviceCategories } from "@/lib/services";
+import { divisions } from "@/lib/services";
 
 export default function ServiceRequestForm() {
   const { user, profile } = useAuth();
-  const [category, setCategory] = useState(serviceCategories[0].title);
+  const [category, setCategory] = useState(divisions[0].title);
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export default function ServiceRequestForm() {
             htmlFor="category"
             className="text-sm font-medium text-foreground/80"
           >
-            Service Category
+            Service Division
           </label>
           <select
             id="category"
@@ -77,9 +77,9 @@ export default function ServiceRequestForm() {
             onChange={(event) => setCategory(event.target.value)}
             className="rounded-lg border border-border bg-white px-4 py-2.5 text-sm outline-none focus:border-primary"
           >
-            {serviceCategories.map((serviceCategory) => (
-              <option key={serviceCategory.slug} value={serviceCategory.title}>
-                {serviceCategory.title}
+            {divisions.map((division) => (
+              <option key={division.slug} value={division.title}>
+                {division.title}
               </option>
             ))}
           </select>

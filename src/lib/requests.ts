@@ -17,9 +17,37 @@ const STATUS_LABELS: Record<string, string> = {
   completed: "Resolved",
 };
 
+// Older or hand-edited documents (e.g. added in the Firebase Console) may
+// use a display label or different casing instead of the stored value.
+// Each variant maps onto one of the three canonical statuses.
+const STATUS_ALIASES: Record<string, RequestStatus> = {
+  submitted: "submitted",
+  new: "submitted",
+  open: "submitted",
+  pending: "submitted",
+  in_progress: "in_progress",
+  inprogress: "in_progress",
+  started: "in_progress",
+  working: "in_progress",
+  completed: "completed",
+  complete: "completed",
+  resolved: "completed",
+  done: "completed",
+  closed: "completed",
+};
+
+// Returns the canonical status, or null if the value isn't recognized.
+// A missing/blank status counts as "submitted" (New) - nobody has
+// picked the request up yet.
+export function normalizeStatus(raw: unknown): RequestStatus | null {
+  if (typeof raw !== "string" || raw.trim() === "") return "submitted";
+  const key = raw.trim().toLowerCase().replace(/[\s-]+/g, "_");
+  return STATUS_ALIASES[key] ?? null;
+}
+
 export function formatStatus(status: string): string {
   return (
-    STATUS_LABELS[status] ??
+    STATUS_LABELS[normalizeStatus(status) ?? status] ??
     status
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

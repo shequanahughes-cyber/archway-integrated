@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import AllRequestsTable from "@/components/AllRequestsTable";
+import { useAllRequests } from "@/lib/use-all-requests";
 
 export default function StaffDashboardPage() {
   const { profile, logout } = useAuth();
   const router = useRouter();
+  const { requests, loading, error } = useAllRequests();
 
   async function handleLogout() {
     await logout();
@@ -38,7 +40,7 @@ export default function StaffDashboardPage() {
           Every client service request, most recent first.
         </p>
         <div className="mt-4">
-          <AllRequestsTable />
+          <AllRequestsTable requests={requests} loading={loading} error={error} />
         </div>
       </div>
     </section>

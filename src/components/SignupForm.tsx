@@ -52,9 +52,7 @@ export default function SignupForm() {
         email,
         password
       );
-      console.log("Signup step 1: account created", credential.user.uid);
       await updateProfile(credential.user, { displayName: name });
-      console.log("Signup step 2: profile updated");
       await setDoc(doc(db, "users", credential.user.uid), {
         uid: credential.user.uid,
         name,
@@ -63,16 +61,9 @@ export default function SignupForm() {
         role: "client",
         createdAt: serverTimestamp(),
       });
-      console.log("Signup step 3: Firestore user doc written");
-      const role = "client";
-      console.log("Signup step 4: role read (hardcoded, not fetched):", role);
-      console.log("Signup step 5: redirecting to /client/dashboard");
       router.push("/client/dashboard");
     } catch (err) {
-      const e = err as { code?: string; message?: string } | null;
-      console.error("Signup error:", e?.code, e?.message, err);
-      // TEMP: show error code on screen for debugging — remove when done
-      setError(`${mapFirebaseError(err)} [${e?.code ?? "no code"}]`);
+      setError(mapFirebaseError(err));
       setSubmitting(false);
     }
   }

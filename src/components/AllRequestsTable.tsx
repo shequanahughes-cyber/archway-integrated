@@ -1,59 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { formatStatus, REQUEST_STATUSES, type RequestStatus } from "@/lib/requests";
+import type { StaffServiceRequest } from "@/lib/use-all-requests";
 
-interface StaffServiceRequest {
-  id: string;
-  clientName: string;
-  clientEmail?: string;
-  company: string;
-  category: string;
-  description: string;
-  status: string;
-  createdAt: Timestamp | null;
+interface AllRequestsTableProps {
+  requests: StaffServiceRequest[];
+  loading: boolean;
+  error: string | null;
+  // Rows to tint with a warning color (e.g. admin "Needs Attention").
+  highlightedIds?: ReadonlySet<string>;
+  emptyMessage?: string;
 }
 
-export default function AllRequestsTable() {
-  const [requests, setRequests] = useState<StaffServiceRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function AllRequestsTable({
+  requests,
+  loading,
+  error,
+  highlightedIds,
+  emptyMessage = "No client requests yet.",
+}: AllRequestsTableProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
-
-  useEffect(() => {
-    const requestsQuery = query(collection(db, "requests"), orderBy("createdAt", "desc"));
-
-    const unsubscribe = onSnapshot(
-      requestsQuery,
-      (snapshot) => {
-        setRequests(
-          snapshot.docs.map((docSnapshot) => ({
-            id: docSnapshot.id,
-            ...(docSnapshot.data() as Omit<StaffServiceRequest, "id">),
-          }))
-        );
-        setLoading(false);
-      },
-      (err) => {
-        console.error("[requests] error loading all requests:", err);
-        setError("Couldn't load requests. Please refresh the page.");
-        setLoading(false);
-      }
-    );
-
-    return unsubscribe;
-  }, []);
 
   async function handleStatusChange(requestId: string, status: RequestStatus) {
     setUpdatingId(requestId);
@@ -88,7 +58,7 @@ export default function AllRequestsTable() {
   if (requests.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-muted p-8 text-center text-sm text-foreground/60 sm:p-10">
-        No client requests yet.
+        {emptyMessage}
       </div>
     );
   }
@@ -108,55 +78,68 @@ export default function AllRequestsTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {requests.map((request) => (
-              <tr key={request.id}>
-                <td className="whitespace-nowrap px-6 py-4">
-                  <span className="font-medium text-primary">{request.clientName}</span>
-                  {request.clientEmail && (
-                    <span className="block text-xs text-foreground/50">
-                      {request.clientEmail}
-                    </span>
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
-                  {request.company || "—"}
-                </td>
-                <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
-                  {request.category}
-                </td>
-                <td className="max-w-xs px-6 py-4 text-foreground/70">
-                  {request.description}
-                </td>
-                <td className="px-6 py-4">
-                  <select
-                    value={request.status}
-                    onChange={(event) =>
-                      handleStatusChange(request.id, event.target.value as RequestStatus)
-                    }
-                    disabled={updatingId === request.id}
-                    className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground/80 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {REQUEST_STATUSES.map((status) => (
-                      <option key={status} value={status}>
-                        {formatStatus(status)}
-                      </option>
-                    ))}
-                  </select>
-                  {rowError && rowError.id === request.id && (
-                    <p className="mt-1.5 text-xs text-red-700">{rowError.message}</p>
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-6 py-4 text-foreground/60">
-                  {request.createdAt
-                    ? request.createdAt.toDate().toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "Just now"}
-                </td>
-              </tr>
-            ))}
+            {requests.map((request) => {
+              const highlighted = highlightedIds?.has(request.id) ?? false;
+              return (
+                <tr key={request.id} className={highlighted ? "bg-amber-50/70" : undefined}>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span className="font-medium text-primary">{request.clientName}</span>
+                    {request.clientEmail && (
+                      <span className="block text-xs text-foreground/50">
+                        {request.clientEmail}
+                      </span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
+                    {request.company || "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-foreground/70">
+                    {request.category}
+                  </td>
+                  <td className="max-w-xs px-6 py-4 text-foreground/70">
+                    {request.description}
+                  </td>
+                  <td className="px-6 py-4">
+                    <select
+                      value={request.status ?? ""}
+                      onChange={(event) =>
+                        handleStatusChange(request.id, event.target.value as RequestStatus)
+                      }
+                      disabled={updatingId === request.id}
+                      className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground/80 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {request.status === null && (
+                        <option value="" disabled>
+                          {request.rawStatus} (unrecognized)
+                        </option>
+                      )}
+                      {REQUEST_STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                          {formatStatus(status)}
+                        </option>
+                      ))}
+                    </select>
+                    {rowError && rowError.id === request.id && (
+                      <p className="mt-1.5 text-xs text-red-700">{rowError.message}</p>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-foreground/60">
+                    {request.createdAt
+                      ? request.createdAt.toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "—"}
+                    {highlighted && (
+                      <span className="mt-1 block text-xs font-semibold text-amber-700">
+                        Needs attention
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

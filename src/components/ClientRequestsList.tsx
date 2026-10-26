@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { formatStatus, statusStyles } from "@/lib/requests";
+import { formatStatus, normalizeStatus, statusStyles } from "@/lib/requests";
 
 interface ServiceRequest {
   id: string;
@@ -107,7 +107,8 @@ export default function ClientRequestsList() {
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                      statusStyles[request.status] ?? "bg-muted text-foreground/60"
+                      statusStyles[normalizeStatus(request.status) ?? ""] ??
+                      "bg-muted text-foreground/60"
                     }`}
                   >
                     {formatStatus(request.status)}

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { divisions } from "@/lib/services";
-import { contactInfo } from "@/lib/site";
+import { contactInfo, phoneHref } from "@/lib/site";
 
 const quickLinks = [
   { href: "/", label: "Home" },
@@ -71,7 +71,13 @@ export default function Footer() {
             <li>{contactInfo.location}</li>
             {contactInfo.address && <li>{contactInfo.address}</li>}
             <li className={contactInfo.phone ? undefined : "text-white/40"}>
-              {contactInfo.phone ?? "Phone - TBD"}
+              {contactInfo.phone ? (
+                <a href={phoneHref(contactInfo.phone)} className="hover:text-white">
+                  {contactInfo.phone}
+                </a>
+              ) : (
+                "Phone - TBD"
+              )}
             </li>
             <li className={contactInfo.email ? undefined : "text-white/40"}>
               {contactInfo.email ?? "Email - TBD"}

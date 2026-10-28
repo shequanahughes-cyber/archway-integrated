@@ -8,11 +8,16 @@ export const contactInfo: {
   hours: { days: string; time: string }[] | null;
 } = {
   location: "Downtown St. Louis Regional Hub",
-  address: null,
-  phone: null,
+  address: "1304 Papin 63103",
+  phone: "+1 866-293-4929",
   email: null,
   hours: null,
 };
+
+// "+1 866-293-4929" -> "tel:+18662934929"
+export function phoneHref(phone: string): string {
+  return `tel:${phone.replace(/[^\d+]/g, "")}`;
+}
 
 // LeadConnector form IDs (link.businessbalancesystem.com). Appointment and
 // partner requests reuse the general contact form until dedicated forms are

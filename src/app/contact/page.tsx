@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { contactInfo } from "@/lib/site";
+import { contactInfo, phoneHref } from "@/lib/site";
 import PageHeader from "@/components/PageHeader";
 import ContactForm from "@/components/ContactForm";
 
@@ -41,7 +41,7 @@ export default function ContactPage() {
                 <li className="flex items-start gap-3">
                   <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                   {contactInfo.phone ? (
-                    <a href={`tel:${contactInfo.phone}`} className="hover:text-primary">
+                    <a href={phoneHref(contactInfo.phone)} className="hover:text-primary">
                       {contactInfo.phone}
                     </a>
                   ) : (

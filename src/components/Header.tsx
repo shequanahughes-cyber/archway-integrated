@@ -33,10 +33,10 @@ export default function Header() {
             width={1080}
             height={855}
             priority
-            className="h-12 w-auto sm:h-14"
+            className="h-14 w-auto sm:h-20 lg:h-24"
           />
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium lg:flex">
+        <nav className="hidden items-center gap-5 text-sm font-medium lg:flex xl:gap-6">
           {navLinks.map((link) => {
             const active = isActive(pathname, link.href);
             return (

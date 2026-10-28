@@ -99,7 +99,7 @@ export default async function DivisionPage({
             })}
           </div>
 
-          <aside className="h-fit rounded-xl bg-primary p-8 text-white lg:sticky lg:top-28">
+          <aside className="h-fit rounded-xl bg-primary p-8 text-white lg:sticky lg:top-32">
             <h2 className="text-xl font-semibold">
               {hasAvailable ? "Work with this division" : "Interested in what's next?"}
             </h2>

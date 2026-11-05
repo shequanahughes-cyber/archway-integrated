@@ -4,7 +4,7 @@
         return createRequire(import.meta.url);
       })();
     
-import "../esm-chunks/chunk-6BT4RYQJ.js";
+import "../esm-chunks/chunk-VJBIAOVP.js";
 
 // src/run/config.ts
 import { existsSync } from "node:fs";
@@ -26,6 +26,11 @@ var setRunConfig = (config) => {
     incrementalCacheHandlerPath: cacheHandler
   };
   config.cacheHandler = cacheHandler;
+  config.images = {
+    ...config.images,
+    // @ts-expect-error `maximumDiskCacheSize` is not typed in min Next.js config type
+    maximumDiskCacheSize: 0
+  };
   setInMemoryCacheMaxSizeFromNextConfig(
     config.cacheMaxMemorySize ?? config.experimental?.isrMemoryCacheSize
   );

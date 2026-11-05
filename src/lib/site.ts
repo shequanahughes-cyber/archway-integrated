@@ -19,11 +19,18 @@ export function phoneHref(phone: string): string {
   return `tel:${phone.replace(/[^\d+]/g, "")}`;
 }
 
-// LeadConnector form IDs (link.businessbalancesystem.com). Appointment and
-// partner requests reuse the general contact form until dedicated forms are
-// built - swap the IDs here when they exist.
+// LeadConnector booking calendar (Appointments page). embedId is the iframe
+// id from the embed code LeadConnector generated - kept as-is since
+// form_embed.js looks the iframe up by it.
+export const bookingCalendar = {
+  id: "IwWcq0y3Z3AzoPieV8ei",
+  embedId: "IwWcq0y3Z3AzoPieV8ei_1793846503897",
+};
+
+// LeadConnector form IDs (link.businessbalancesystem.com). Partner requests
+// reuse the general contact form until a dedicated form is built - swap the
+// ID here when it exists.
 export const formIds = {
   contact: "ZgkzNXPgqBrLCvgNWFzB",
-  appointment: "ZgkzNXPgqBrLCvgNWFzB",
   partner: "ZgkzNXPgqBrLCvgNWFzB",
 };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { contactInfo, phoneHref } from "@/lib/site";
 import PageHeader from "@/components/PageHeader";
@@ -80,6 +81,17 @@ export default function ContactPage() {
                   <Pending label="Operating hours" />
                 </p>
               )}
+            </div>
+
+            <div className="rounded-2xl border border-border bg-muted p-6 text-sm leading-6 text-foreground/70">
+              Ready to come in?{" "}
+              <Link
+                href="/appointments"
+                className="font-semibold text-primary hover:text-primary-dark"
+              >
+                Book an appointment
+              </Link>{" "}
+              on our calendar - pick a day and time that works for you.
             </div>
 
             <div className="rounded-2xl border border-border bg-muted p-6 text-sm leading-6 text-foreground/70">

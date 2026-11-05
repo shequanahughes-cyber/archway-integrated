@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { divisions } from "@/lib/services";
-import { formIds } from "@/lib/site";
 import PageHeader from "@/components/PageHeader";
-import ContactForm from "@/components/ContactForm";
+import BookingCalendar from "@/components/BookingCalendar";
 
 export const metadata: Metadata = {
-  title: "Request an Appointment | Archway Integrated",
+  title: "Book an Appointment | Archway Integrated",
   description:
-    "Request an appointment for drug and alcohol testing, fingerprinting, identity verification, notary, and other services at Archway's St. Louis Regional Hub.",
+    "Book an appointment for drug and alcohol testing, fingerprinting, identity verification, notary, and other services at Archway's St. Louis Regional Hub.",
 };
 
 export default function AppointmentsPage() {
@@ -23,9 +22,9 @@ export default function AppointmentsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Appointments" title="Request an appointment.">
-        Tell us which service you need and when you&apos;re available. Our
-        team will confirm your appointment time.
+      <PageHeader eyebrow="Appointments" title="Book an appointment.">
+        Pick a day and time that works for you on our calendar. Our team will
+        follow up to confirm your visit.
       </PageHeader>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
@@ -72,11 +71,8 @@ export default function AppointmentsPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-white p-8 sm:p-10">
-            <ContactForm
-              formId={formIds.appointment}
-              formName="Appointment Request Form (on the website)"
-            />
+          <div className="rounded-2xl border border-border bg-white p-4 sm:p-6">
+            <BookingCalendar />
           </div>
         </div>
       </section>

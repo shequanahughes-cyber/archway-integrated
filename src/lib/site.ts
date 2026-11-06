@@ -1,22 +1,27 @@
-// Contact details shown in the footer and on the Contact page. `null`
-// renders as "pending" until the client provides the real value.
+// Contact details shown in the footer and on the Contact page. `null` (or
+// an empty phones list) renders as "pending" until the client provides
+// the real value.
 export const contactInfo: {
   location: string;
   address: string | null;
-  phone: string | null;
+  phones: { label: string; number: string }[];
   email: string | null;
   hours: { days: string; time: string }[] | null;
 } = {
   location: "Downtown St. Louis Regional Hub",
   address: "1304 Papin 63103",
-  phone: "+1 866-293-4929",
+  phones: [
+    { label: "Toll-free", number: "+1 866-293-4929" },
+    { label: "Local", number: "314-380-0357" },
+  ],
   email: null,
   hours: null,
 };
 
-// "+1 866-293-4929" -> "tel:+18662934929"
+// "+1 866-293-4929" -> "tel:+18662934929", "314-380-0357" -> "tel:+13143800357"
 export function phoneHref(phone: string): string {
-  return `tel:${phone.replace(/[^\d+]/g, "")}`;
+  const digits = phone.replace(/[^\d+]/g, "");
+  return `tel:${digits.startsWith("+") ? digits : `+1${digits}`}`;
 }
 
 // LeadConnector booking calendar (Appointments page). embedId is the iframe

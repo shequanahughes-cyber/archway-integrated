@@ -41,10 +41,17 @@ export default function ContactPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-                  {contactInfo.phone ? (
-                    <a href={phoneHref(contactInfo.phone)} className="hover:text-primary">
-                      {contactInfo.phone}
-                    </a>
+                  {contactInfo.phones.length > 0 ? (
+                    <div className="space-y-1">
+                      {contactInfo.phones.map((phone) => (
+                        <p key={phone.number}>
+                          <a href={phoneHref(phone.number)} className="hover:text-primary">
+                            {phone.number}
+                          </a>{" "}
+                          <span className="text-foreground/50">({phone.label})</span>
+                        </p>
+                      ))}
+                    </div>
                   ) : (
                     <Pending label="Phone number" />
                   )}

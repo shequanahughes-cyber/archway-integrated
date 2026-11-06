@@ -70,15 +70,18 @@ export default function Footer() {
           <ul className="mt-4 space-y-2 text-sm text-white/70">
             <li>{contactInfo.location}</li>
             {contactInfo.address && <li>{contactInfo.address}</li>}
-            <li className={contactInfo.phone ? undefined : "text-white/40"}>
-              {contactInfo.phone ? (
-                <a href={phoneHref(contactInfo.phone)} className="hover:text-white">
-                  {contactInfo.phone}
-                </a>
-              ) : (
-                "Phone - TBD"
-              )}
-            </li>
+            {contactInfo.phones.length > 0 ? (
+              contactInfo.phones.map((phone) => (
+                <li key={phone.number}>
+                  <a href={phoneHref(phone.number)} className="hover:text-white">
+                    {phone.number}
+                  </a>{" "}
+                  <span className="text-white/40">({phone.label})</span>
+                </li>
+              ))
+            ) : (
+              <li className="text-white/40">Phone - TBD</li>
+            )}
             <li className={contactInfo.email ? undefined : "text-white/40"}>
               {contactInfo.email ?? "Email - TBD"}
             </li>

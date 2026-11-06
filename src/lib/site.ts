@@ -1,24 +1,28 @@
 // Contact details shown in the footer and on the Contact page. `null` (or
-// an empty phones list) renders as "pending" until the client provides
-// the real value.
+// an empty phones/emails list) renders as "pending" until the client
+// provides the real value.
 export const contactInfo: {
   location: string;
   address: string | null;
   phones: { label: string; number: string }[];
-  email: string | null;
+  emails: { label: string; address: string }[];
   hours: { days: string; time: string }[] | null;
 } = {
   location: "Downtown St. Louis Regional Hub",
   address: "1304 Papin 63103",
   phones: [
     { label: "Toll-free", number: "+1 866-293-4929" },
-    { label: "Local", number: "314-380-0357" },
+    { label: "Local", number: "314-899-0042" },
   ],
-  email: null,
+  // Main inbox first.
+  emails: [
+    { label: "General inquiries", address: "info@archwaymedsolutions.com" },
+    { label: "Partnerships & contracts", address: "partnerships@archwaymedsolutions.com" },
+  ],
   hours: null,
 };
 
-// "+1 866-293-4929" -> "tel:+18662934929", "314-380-0357" -> "tel:+13143800357"
+// "+1 866-293-4929" -> "tel:+18662934929", "314-899-0042" -> "tel:+13148990042"
 export function phoneHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, "");
   return `tel:${digits.startsWith("+") ? digits : `+1${digits}`}`;

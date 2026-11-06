@@ -58,10 +58,20 @@ export default function ContactPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-                  {contactInfo.email ? (
-                    <a href={`mailto:${contactInfo.email}`} className="hover:text-primary">
-                      {contactInfo.email}
-                    </a>
+                  {contactInfo.emails.length > 0 ? (
+                    <div className="space-y-2">
+                      {contactInfo.emails.map((email) => (
+                        <p key={email.address}>
+                          <a
+                            href={`mailto:${email.address}`}
+                            className="break-all hover:text-primary"
+                          >
+                            {email.address}
+                          </a>
+                          <span className="block text-xs text-foreground/50">{email.label}</span>
+                        </p>
+                      ))}
+                    </div>
                   ) : (
                     <Pending label="Email address" />
                   )}

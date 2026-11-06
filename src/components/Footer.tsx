@@ -82,9 +82,18 @@ export default function Footer() {
             ) : (
               <li className="text-white/40">Phone - TBD</li>
             )}
-            <li className={contactInfo.email ? undefined : "text-white/40"}>
-              {contactInfo.email ?? "Email - TBD"}
-            </li>
+            {contactInfo.emails.length > 0 ? (
+              contactInfo.emails.map((email) => (
+                <li key={email.address}>
+                  <a href={`mailto:${email.address}`} className="break-all hover:text-white">
+                    {email.address}
+                  </a>
+                  <span className="block text-xs text-white/40">{email.label}</span>
+                </li>
+              ))
+            ) : (
+              <li className="text-white/40">Email - TBD</li>
+            )}
           </ul>
         </div>
       </div>

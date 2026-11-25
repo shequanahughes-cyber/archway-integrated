@@ -19,7 +19,11 @@ export const contactInfo: {
     { label: "General inquiries", address: "info@archwaymedsolutions.com" },
     { label: "Partnerships & contracts", address: "partnerships@archwaymedsolutions.com" },
   ],
-  hours: null,
+  hours: [
+    { days: "Monday – Friday", time: "9:00 AM – 6:00 PM" },
+    { days: "2nd & 4th Saturday", time: "9:00 AM – 1:00 PM" },
+    { days: "Sunday", time: "Closed" },
+  ],
 };
 
 // "+1 866-293-4929" -> "tel:+18662934929", "314-899-0042" -> "tel:+13148990042"

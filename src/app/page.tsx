@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { divisionStatus, divisions } from "@/lib/services";
+import { contactInfo } from "@/lib/site";
 import { photos } from "@/lib/images";
 import LocationCallout from "@/components/LocationCallout";
 import StatusBadge from "@/components/StatusBadge";
@@ -66,6 +67,22 @@ export default function Home() {
               full picture — from onboarding a new hire to delivering
               time-sensitive medical supplies.
             </p>
+            {contactInfo.hours && (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Clock className="h-4 w-4 text-accent" />
+                  Hours
+                </h3>
+                <dl className="mt-3 max-w-sm space-y-1.5 text-sm">
+                  {contactInfo.hours.map((row) => (
+                    <div key={row.days} className="flex justify-between gap-4">
+                      <dt className="font-medium text-foreground/80">{row.days}</dt>
+                      <dd className="text-foreground/70">{row.time}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
           </div>
           <LocationCallout />
         </div>
